@@ -6,15 +6,16 @@
 <title>CreaDev — Digital Product Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<!-- 1. استبدال الأحرف المختصرة بأيقونات Devicon -->
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
-<!-- مكتبة VanillaTilt للـ 3D Tilt -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+<!-- مكتبة Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
 <style>
   :root{
     --bg:#0C0A13;
     --bg-2:#120E1C;
-    --panel:rgba(23, 19, 31, 0.7); /* 3. Glassmorphism للكروت */
+    --panel:rgba(23, 19, 31, 0.7);
     --panel-2:rgba(29, 24, 41, 0.8);
     --line: rgba(245,243,247,0.09);
     --cream:#F5F3F7;
@@ -48,7 +49,6 @@
   }
   .eyebrow::before{content:''; width:18px; height:1px; background:var(--violet-2);}
 
-  /* 2. إضافة Aurora Background وتطوير الإضاءة المحيطة */
   .glow{
     position:fixed; inset:0; z-index:-1; pointer-events:none; overflow:hidden;
     background: radial-gradient(circle at 15% 20%, rgba(139, 92, 246, 0.15), transparent 40%),
@@ -67,13 +67,6 @@
     0% { transform: translate(0px, 0px) scale(1); }
     50% { transform: translate(30px, -40px) scale(1.1); }
     100% { transform: translate(-20px, 20px) scale(0.95); }
-  }
-
-  .cursor-glow{
-    position:fixed; width:420px; height:420px; border-radius:50%; pointer-events:none; z-index:1;
-    background:radial-gradient(circle, rgba(139,92,246,0.10), transparent 70%);
-    transform:translate(-50%,-50%); left:var(--x,50%); top:var(--y,50%);
-    transition:opacity .3s; opacity:0;
   }
 
   .python-blue {
@@ -107,7 +100,6 @@
   .drop a{display:block; padding:8px 10px; border-radius:6px; font-size:14px;}
   .drop a:hover{background:var(--violet-dim); color:var(--violet-2);}
   
-  /* 7. تحسين الأزرار (Ripple + Magnetic) */
   .nav-cta, .btn {
     position: relative;
     overflow: hidden;
@@ -116,11 +108,8 @@
   .nav-cta{font-family:var(--mono); font-size:13px; padding:11px 20px; border-radius:999px; background:var(--violet); color:#fff; font-weight:500;}
   .nav-cta:hover{background:#7a48e8; box-shadow:0 8px 20px -6px var(--violet-dim); transform: scale(1.05);}
 
-  /* 6. تحسين Hero بالـ Parallax */
   .hero{padding:120px 0 80px; text-align:center; position:relative; perspective: 1000px;}
-  .hero-content-parallax {
-    transition: transform 0.1s ease-out;
-  }
+  .hero-content-parallax {transition: transform 0.1s ease-out;}
   .hero .eyebrow{animation:riseIn .9s var(--ease) .05s both; justify-content:center;}
   .hero h1{animation:riseIn .9s var(--ease) .16s both;}
   .hero .lede{animation:riseIn .9s var(--ease) .32s both;}
@@ -138,23 +127,37 @@
   .btn-ghost:hover{border-color:var(--violet-2); color:var(--violet-2); transform:translateY(-3px) scale(1.02); background: rgba(139, 92, 246, 0.05);}
 
   .trust-strip{
-    display:flex; overflow:hidden; -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
+    display:flex; 
+    overflow:hidden; 
+    width: 100%;
+    position: relative;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
     mask-image:linear-gradient(90deg,transparent,#000 10%,#000 90%,transparent);
   }
-  .trust-track{display:flex; gap:14px; flex-shrink:0; opacity:.9; font-family:var(--mono); font-size:13px; color:var(--cream); animation:marquee 30s linear infinite; padding-inline-end:14px;}
+  .trust-track{
+    display:flex; 
+    gap:14px; 
+    flex-shrink:0; 
+    opacity:.9; 
+    font-family:var(--mono); 
+    font-size:13px; 
+    color:var(--cream); 
+    animation: marquee 30s linear infinite;
+    will-change: transform;
+  }
   .trust-strip:hover .trust-track{animation-play-state:paused;}
   .tech-chip{
     display:flex; align-items:center; gap:9px; padding:9px 16px 9px 10px; border:1px solid var(--line);
     border-radius:999px; white-space:nowrap; background:var(--panel); backdrop-filter: blur(8px); transition:border-color .25s, transform .25s;
   }
   .tech-chip:hover{border-color:var(--violet); transform:translateY(-2px);}
-  .tech-chip .tico{
-    width:22px; height:22px; display:flex; align-items:center; justify-content:center;
-    font-size:18px; flex-shrink:0;
+  .tech-chip .tico{width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;}
+  
+  @keyframes marquee{
+    0% { transform: translateX(0); }
+    100% { transform: translateX(calc(-100% - 14px)); }
   }
-  @keyframes marquee{from{transform:translateX(0);}to{transform:translateX(-100%);}}
 
-  /* STATS (11. العدادات والإحصائيات) */
   .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; margin-top:70px; backdrop-filter: blur(10px);}
   .stat{background:var(--panel); padding:32px 24px; text-align:center; transition:background .3s, transform 0.3s;}
   .stat:hover{background:var(--panel-2); transform: translateY(-3px);}
@@ -167,17 +170,10 @@
   .section-head h2{font-family:var(--display); font-weight:700; font-size:clamp(30px,3.6vw,42px); margin-bottom:14px; letter-spacing:-.01em;}
   .section-head p{color:var(--muted); font-size:16px;}
 
-  /* SERVICES (3. Glassmorphism + 4. Hover & Floating + 5. 3D Tilt) */
   .services-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
   .service-card{
-    background: var(--panel);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border:1px solid var(--line); 
-    border-radius:var(--radius); 
-    padding:30px; 
-    transition:all .3s var(--ease);
-    transform-style: preserve-strength;
+    background: var(--panel); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border:1px solid var(--line); border-radius:var(--radius); padding:30px; transition:all .3s var(--ease);
   }
   .service-card:hover{border-color:var(--violet); box-shadow: 0 15px 30px -10px rgba(139,92,246,0.2);}
   .service-card .ico{width:44px; height:44px; border-radius:12px; background:var(--violet-dim); color:var(--violet-2); display:flex; align-items:center; justify-content:center; font-size:19px; margin-bottom:18px; transition:transform .4s cubic-bezier(.2,.8,.2,1), background .3s;}
@@ -185,56 +181,135 @@
   .service-card h3{font-family:var(--display); font-size:18px; font-weight:600; margin-bottom:10px;}
   .service-card p{color:var(--muted); font-size:14.5px;}
 
-  /* WORK (8. تحسين قسم الأعمال Zoom + Shine) */
-  .work-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:20px;}
-  .work-card{
-    background:var(--panel); 
-    backdrop-filter: blur(12px);
-    border:1px solid var(--line); 
-    border-radius:var(--radius); 
-    overflow:hidden; 
-    transition:transform .3s var(--ease), border-color .3s, box-shadow .3s;
+  /* --- التنسيق الجديد والمحسن لبطاقات المشاريع (Work Cards) --- */
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
   }
-  .work-card:hover{transform:translateY(-6px); border-color:var(--violet); box-shadow: 0 20px 40px -15px rgba(139,92,246,0.25);}
-  .work-thumb{height:220px; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden; background: rgba(0,0,0,0.2);}
-  
-  /* تأثير الـ Shine والـ Zoom */
-  .work-thumb::after{
-    content:''; position:absolute; inset:0; background:linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.15) 50%, transparent 70%);
-    transform:translateX(-150%); transition:transform .8s cubic-bezier(0.16, 1, 0.3, 1);
+  .work-card {
+    background: var(--panel);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.35s var(--ease), border-color 0.35s, box-shadow 0.35s;
   }
-  .work-card:hover .work-thumb::after{transform:translateX(150%);}
-  .work-card:hover .device{transform:scale(1.05) translateY(-4px); transition: transform 0.4s var(--ease);}
-  .work-thumb .device{width:78%; height:70%; border-radius:8px 8px 0 0; background:var(--bg-2); border:1px solid var(--line); border-bottom:none; box-shadow:0 20px 40px -18px rgba(0,0,0,.6); position:relative; padding:14px; transition: transform 0.4s var(--ease);}
-  .work-thumb .device .bar{display:flex; gap:5px; margin-bottom:10px;}
-  .work-thumb .device .bar i{width:7px; height:7px; border-radius:50%; background:var(--line);}
-  .work-thumb .device .lines i{display:block; height:7px; border-radius:4px; background:var(--line); margin-bottom:8px;}
+  .work-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--violet);
+    box-shadow: 0 20px 45px -12px rgba(139, 92, 246, 0.25);
+  }
+  .work-thumb {
+    height: 240px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: rgba(0, 0, 0, 0.35);
+    border-bottom: 1px solid var(--line);
+  }
+  .work-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s var(--ease);
+  }
+  .work-card:hover .work-thumb img {
+    transform: scale(1.04);
+  }
+  /* تأثير وميض الضوء المتحرك عند الهوفر فوق الصورة */
+  .work-thumb::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(115deg, transparent 30%, rgba(255, 255, 255, 0.12) 50%, transparent 70%);
+    transform: translateX(-150%);
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+  }
+  .work-card:hover .work-thumb::after {
+    transform: translateX(150%);
+  }
+  /* محاكاة نافذة المتصفح في حال عدم توفر صورة حقيقية */
+  .work-thumb .device {
+    width: 82%;
+    height: 75%;
+    border-radius: 8px 8px 0 0;
+    background: var(--bg-2);
+    border: 1px solid var(--line);
+    border-bottom: none;
+    box-shadow: 0 20px 40px -18px rgba(0,0,0,.6);
+    position: relative;
+    padding: 14px;
+    transition: transform 0.4s var(--ease);
+  }
+  .work-thumb .device .bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .work-thumb .device .bar i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--line);
+  }
+  .work-thumb .device .lines i {
+    display: block;
+    height: 7px;
+    border-radius: 4px;
+    background: var(--line);
+    margin-bottom: 8px;
+  }
   .work-thumb .device .lines i:nth-child(1){width:60%;}
   .work-thumb .device .lines i:nth-child(2){width:90%;}
-  .work-thumb .device .lines i:nth-child(3){width:40%; background:var(--violet); opacity:.5;}
-  .work-body{padding:22px 24px 26px;}
-  .work-body .tag{font-family:var(--mono); font-size:11px; color:var(--violet-2); text-transform:uppercase; letter-spacing:.06em; margin-bottom:8px;}
-  .work-body h3{font-family:var(--display); font-size:19px; font-weight:600; margin-bottom:8px;}
-  .work-body p{color:var(--muted); font-size:14px;}
+  .work-thumb .device .lines i:nth-child(3){width:40%; background:var(--violet); opacity:.6;}
+  
+  .work-body {
+    padding: 24px 26px 28px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+  }
+  .work-body .tag {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--violet-2);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+  .work-body h3 {
+    font-family: var(--display);
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--cream);
+    line-height: 1.4;
+  }
+  .work-body p {
+    color: var(--muted);
+    font-size: 14.5px;
+    line-height: 1.6;
+  }
 
-  /* TEAM (9. تحسين Team Cards) */
   .team-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:20px;}
   .team-card{
-    background:var(--panel); 
-    backdrop-filter: blur(12px);
-    border:1px solid var(--line); 
-    border-radius:var(--radius); 
-    padding:32px 22px;
-    text-align:center; 
+    background:var(--panel); backdrop-filter: blur(12px); border:1px solid var(--line); 
+    border-radius:var(--radius); padding:32px 22px; text-align:center; 
     transition:transform .35s var(--ease), border-color .35s var(--ease), box-shadow .35s;
   }
   .team-card:hover{transform:translateY(-6px); border-color:var(--violet); box-shadow: 0 15px 35px -10px rgba(139,92,246,0.2);}
   .avatar{
     width:104px; height:104px; border-radius:50%; margin:0 auto 20px; position:relative;
-    background:var(--bg-2); border:2px solid var(--line);
-    display:flex; align-items:center; justify-content:center; overflow:hidden;
-    transition:all .3s;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    background:var(--bg-2); border:2px solid var(--line); display:flex; align-items:center; 
+    justify-content:center; overflow:hidden; transition:all .3s; box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   }
   .team-card:hover .avatar{border-color:var(--violet-2); transform: scale(1.05); box-shadow: 0 10px 25px var(--violet-dim);}
   .avatar img{width:100%; height:100%; object-fit:cover; display:none;}
@@ -250,7 +325,6 @@
   .team-card .gh:hover{color:var(--cream); border-color:var(--violet-2); background: var(--violet-dim);}
   .team-card .gh svg{width:13px; height:13px;}
 
-  /* PROCESS */
   .process{display:grid; grid-template-columns:repeat(4,1fr); gap:0; position:relative;}
   .process::before{content:''; position:absolute; top:22px; left:12%; right:12%; height:1px; background:var(--line);}
   .step{position:relative; padding-top:0; text-align:center;}
@@ -258,19 +332,10 @@
   .step h4{font-family:var(--display); font-size:16px; font-weight:600; margin-bottom:8px;}
   .step p{color:var(--muted); font-size:13.5px; max-width:220px; margin:0 auto;}
 
-  /* CTA / CONTACT (10. تحسين Contact Form) */
   .cta-panel{
-    background:var(--panel); 
-    backdrop-filter: blur(16px);
-    border:1px solid var(--line); 
-    border-radius:24px; 
-    padding:60px; 
-    display:grid; 
-    grid-template-columns:1fr 1fr; 
-    gap:50px; 
-    position:relative; 
-    overflow:hidden;
-    box-shadow: 0 25px 50px -15px rgba(0,0,0,0.5);
+    background:var(--panel); backdrop-filter: blur(16px); border:1px solid var(--line); 
+    border-radius:24px; padding:60px; display:grid; grid-template-columns:1fr 1fr; 
+    gap:50px; position:relative; overflow:hidden; box-shadow: 0 25px 50px -15px rgba(0,0,0,0.5);
   }
   .cta-panel::before{content:''; position:absolute; width:360px; height:360px; border-radius:50%; background:radial-gradient(circle, var(--violet-dim), transparent 70%); top:-160px; inset-inline-end:-120px; pointer-events: none;}
   .cta-left h2{font-family:var(--display); font-size:clamp(26px,3vw,34px); font-weight:700; margin-bottom:18px;}
@@ -289,56 +354,17 @@
   textarea{resize:vertical; min-height:120px;}
   form .btn-primary{border:none; width:100%; justify-content:center; font-family:var(--body); padding: 16px; margin-top: 4px;}
 
-  /* GLOBAL */
+  /* --- GLOBAL 3D GLOBE SECTION --- */
   .global{display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center;}
-  .dotmap{
+  .globe-container{
     position:relative; aspect-ratio:1.15/1; border-radius:var(--radius); overflow:hidden;
-    background:
-      radial-gradient(420px 320px at 60% 45%, rgba(139,92,246,0.16), transparent 70%),
-      var(--panel);
-    border:1px solid var(--line);
-    display:flex; align-items:center; justify-content:center;
+    background: radial-gradient(420px 320px at 60% 45%, rgba(139,92,246,0.16), transparent 70%), var(--panel);
+    border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
     backdrop-filter: blur(10px);
   }
-  .dotmap .rings{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
-  .dotmap .ring{
-    position:absolute; border-radius:50%; border:1px solid var(--line);
-    animation:ringSpin 60s linear infinite;
-  }
-  .dotmap .ring.r1{width:56%; padding-bottom:56%; border-style:dashed; animation-duration:90s;}
-  .dotmap .ring.r2{width:76%; padding-bottom:76%; animation-duration:70s; animation-direction:reverse;}
-  .dotmap .ring.r3{width:96%; padding-bottom:96%; border-style:dashed; opacity:.6; animation-duration:110s;}
-  @keyframes ringSpin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
-  .dotmap .dotfield{
-    position:absolute; inset:0;
-    background-image:radial-gradient(rgba(245,243,247,0.22) 1.4px, transparent 1.4px);
-    background-size:20px 20px;
-    -webkit-mask-image:radial-gradient(60% 60% at 60% 45%, #000 55%, transparent 100%);
-    mask-image:radial-gradient(60% 60% at 60% 45%, #000 55%, transparent 100%);
-  }
-  .dotmap .core{
-    position:absolute; width:9px; height:9px; border-radius:50%; background:var(--violet-2);
-    top:45%; inset-inline-start:60%; box-shadow:0 0 0 0 var(--violet-dim);
-    animation:corePulse 3.2s var(--ease) infinite;
-  }
-  @keyframes corePulse{
-    0%{box-shadow:0 0 0 0 rgba(192,132,252,0.30);}
-    100%{box-shadow:0 0 0 28px rgba(192,132,252,0);}
-  }
-  .pin{
-    position:absolute; padding:7px 14px; background:var(--panel-2); color:var(--cream); border:1px solid var(--violet);
-    font-family:var(--mono); font-size:12px; border-radius:999px; box-shadow:0 10px 22px -8px rgba(0,0,0,.5);
-    display:flex; align-items:center; gap:7px; transform:translate(-50%,-100%); animation:pinDrop .6s cubic-bezier(.2,.8,.2,1) both;
-    backdrop-filter: blur(8px);
-  }
-  .pin .led{width:6px; height:6px; border-radius:50%; background:var(--violet-2); box-shadow:0 0 8px var(--violet-2); animation:blink 1.6s infinite;}
-  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
-  @keyframes pinDrop{from{opacity:0; transform:translate(-50%,-70%);}to{opacity:1; transform:translate(-50%,-100%);}}
-  .dotmap .arc path{filter:drop-shadow(0 0 3px rgba(192,132,252,0.5));}
-  .dotmap .traveler{
-    offset-rotate:0deg; animation:travelArc 3s linear infinite;
-  }
-  @keyframes travelArc{0%{offset-distance:0%; opacity:0;}8%{opacity:1;}92%{opacity:1;}100%{offset-distance:100%; opacity:0;}}
+  #globe-canvas { width: 100%; height: 100%; display: block; outline: none; cursor: grab; }
+  #globe-canvas:active { cursor: grabbing; }
+  
   .global-list li{display:flex; gap:14px; padding:16px 0; border-top:1px solid var(--line);}
   .global-list li:first-child{border-top:none;}
   .global-list b{font-family:var(--display); font-size:15px; display:block; margin-bottom:4px;}
@@ -364,38 +390,6 @@
     .cta-panel{grid-template-columns:1fr; padding:36px 24px;}
     .form-row{grid-template-columns:1fr;}
     .global{grid-template-columns:1fr;}
-  }
-
-  /* 4. Hover & Floating Animations */
-  @keyframes floatSlow {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-  }
-  @keyframes floatDelayed {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-  @keyframes floatFast {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-6px); }
-  }
-
-  .service-card { animation: floatSlow 6s ease-in-out infinite; }
-  .service-card:nth-child(2) { animation: floatDelayed 7s ease-in-out infinite 1s; }
-  .service-card:nth-child(3) { animation: floatFast 5s ease-in-out infinite 0.5s; }
-  .service-card:nth-child(4) { animation: floatDelayed 6.5s ease-in-out infinite 1.5s; }
-  .service-card:nth-child(5) { animation: floatSlow 5.5s ease-in-out infinite 0.8s; }
-  .service-card:nth-child(6) { animation: floatFast 7.2s ease-in-out infinite 2s; }
-
-  .work-card { animation: floatSlow 6.5s ease-in-out infinite; }
-  .work-card:nth-child(even) { animation: floatDelayed 7.5s ease-in-out infinite 1.2s; }
-
-  .team-card { animation: floatFast 6s ease-in-out infinite; }
-  .team-card:nth-child(2) { animation: floatSlow 7s ease-in-out infinite 0.9s; }
-  .team-card:nth-child(3) { animation: floatDelayed 5.8s ease-in-out infinite 1.8s; }
-
-  .service-card:hover, .work-card:hover, .team-card:hover {
-    animation-play-state: paused;
   }
 </style>
 </head>
@@ -426,7 +420,6 @@
 
 <div class="wrap">
 
-  <!-- 6. تحسين Hero بالـ Parallax -->
   <section class="hero" id="heroSection">
     <div class="hero-content-parallax" id="heroContent">
       <div class="eyebrow" style="justify-content:center;">Product &amp; engineering studio</div>
@@ -437,19 +430,7 @@
         <a href="#work" class="btn btn-ghost">See our work</a>
       </div>
       <div class="trust-strip" data-reveal>
-        <div class="trust-track">
-          <span class="tech-chip"><span class="tico"><i class="devicon-react-original colored"></i></span>React</span>
-          <span class="tech-chip"><span class="tico"><i class="devicon-nextjs-plain colored" style="filter: invert(1);"></i></span>Next.js</span>
-          <span class="tech-chip"><span class="tico"><i class="devicon-nodejs-plain colored"></i></span>Node.js</span>
-          <span class="tech-chip"><span class="tico"><i class="devicon-express-original" style="filter: invert(1);"></i></span>Express</span>
-          <span class="tech-chip"><span class="tico"><i class="devicon-django-plain colored"></i></span>Django</span>
-          <span class="tech-chip"><span class="tico"><i class="devicon-fastapi-plain colored"></i></span>FastAPI</span>
-          <span class="tech-chip"><span class="tico"><i class="devicon-postgresql-plain colored"></i></span>PostgreSQL</span>
-          <span class="tech-chip"><span class="tico"><i class="devicon-mysql-original colored"></i></span>MySQL</span>
-          <span class="tech-chip"><span class="tico"><i class="devicon-python-plain colored python-blue"></i></span>Python</span>
-          <span class="tech-chip"><span class="tico"><i class="devicon-tailwindcss-original colored"></i></span>Tailwind</span>
-        </div>
-        <div class="trust-track" aria-hidden="true">
+        <div class="trust-track" id="trustTrack">
           <span class="tech-chip"><span class="tico"><i class="devicon-react-original colored"></i></span>React</span>
           <span class="tech-chip"><span class="tico"><i class="devicon-nextjs-plain colored" style="filter: invert(1);"></i></span>Next.js</span>
           <span class="tech-chip"><span class="tico"><i class="devicon-nodejs-plain colored"></i></span>Node.js</span>
@@ -464,12 +445,51 @@
       </div>
     </div>
 
-    <!-- 11. تحسين العدادات والإحصائيات -->
     <div class="stats" data-reveal>
       <div class="stat"><b data-count="60" data-suffix="+">0</b><span>Products shipped</span></div>
       <div class="stat"><b data-count="98" data-suffix="%">0</b><span>Client retention</span></div>
       <div class="stat"><b data-count="24" data-suffix="h">0</b><span>First response time</span></div>
       <div class="stat"><b data-count="4.9" data-suffix="/5" data-decimal="1">0</b><span>Average rating</span></div>
+    </div>
+  </section>
+
+  <section id="team">
+    <div class="section-head" data-reveal>
+      <div class="eyebrow" style="justify-content:center;">Our people</div>
+      <h2>Meet the team</h2>
+      <p>The senior engineers and leads behind every build.</p>
+    </div>
+    <div class="team-grid">
+      <div class="team-card" data-reveal>
+        <div class="avatar">
+          <img src="https://avatars.githubusercontent.com/u/206440804?v=4" alt="عادل أحمد البوشي">
+          <div class="placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+        </div>
+        <h3>عادل أحمد البوشي</h3>
+        <div class="role">Product Manager</div>
+        <a href="https://adel307.github.io/portfulio/" target="_blank" class="gh">portfolio</a>
+        <a href="https://github.com/adel307" target="_blank" class="gh">GitHub</a>
+      </div>
+      <div class="team-card" data-reveal>
+        <div class="avatar">
+          <img src="https://avatars.githubusercontent.com/u/250884955?v=4" alt="أحمد عيد">
+          <div class="placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+        </div>
+        <h3>أحمد عيد</h3>
+        <div class="role">QA Engineer</div>
+        <a href="https://ahmed1eid.github.io/MyPortufolio/" target="_blank" class="gh">portfolio</a>
+        <a href="https://github.com/ahmed1eid" target="_blank" class="gh">GitHub</a>
+      </div>
+      <div class="team-card" data-reveal>
+        <div class="avatar">
+          <img src="https://avatars.githubusercontent.com/u/125691487?v=4" alt="إسلام حمدي">
+          <div class="placeholder"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg></div>
+        </div>
+        <h3>إسلام حمدي</h3>
+        <div class="role">Backend Team Leader</div>
+        <a href="https://islam-portfolio-phi.vercel.app" target="_blank" class="gh">portfolio</a>
+        <a href="https://github.com/islam412" target="_blank" class="gh">GitHub</a>
+      </div>
     </div>
   </section>
 
@@ -479,95 +499,95 @@
       <h2>Five ways we plug into your roadmap</h2>
       <p>Pick one service or hand us the whole build — the team scales to the brief.</p>
     </div>
-    <!-- 5. إضافة 3D Tilt للكروت -->
     <div class="services-grid">
-      <div class="service-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" data-reveal><div class="ico">◈</div><h3>Web Development</h3><p>Fast, accessible product sites and web apps built for the long run, not the demo.</p></div>
-      <div class="service-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" data-reveal><div class="ico">◇</div><h3>Mobile Apps</h3><p>Native-feel iOS and Android apps from a single React Native codebase.</p></div>
-      <div class="service-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" data-reveal><div class="ico">◆</div><h3>UI/UX Design</h3><p>Interfaces designed around what the user is actually trying to get done.</p></div>
-      <div class="service-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" data-reveal><div class="ico">◐</div><h3>E-commerce</h3><p>Storefronts and checkout flows tuned for conversion, not just for launch day.</p></div>
-      <div class="service-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" data-reveal><div class="ico">✦</div><h3>Applied AI</h3><p>Practical AI features — search, automation, assistants — wired into real workflows.</p></div>
-      <div class="service-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare data-tilt-max-glare="0.2" data-reveal><div class="ico">▣</div><h3>Ongoing Support</h3><p>Monitoring, fixes and iteration after launch, with a team that already knows the codebase.</p></div>
+      <div class="service-card" data-reveal><div class="ico">◈</div><h3>Web Development</h3><p>Fast, accessible product sites and web apps built for the long run, not the demo.</p></div>
+      <div class="service-card" data-reveal><div class="ico">◇</div><h3>Mobile Apps</h3><p>Native-feel iOS and Android apps from a single React Native codebase.</p></div>
+      <div class="service-card" data-reveal><div class="ico">◆</div><h3>UI/UX Design</h3><p>Interfaces designed around what the user is actually trying to get done.</p></div>
+      <div class="service-card" data-reveal><div class="ico">◐</div><h3>E-commerce</h3><p>Storefronts and checkout flows tuned for conversion, not just for launch day.</p></div>
+      <div class="service-card" data-reveal><div class="ico">✦</div><h3>AI Agents</h3><p>Practical AI features — search, automation, assistants — wired into real workflows.</p></div>
+      <div class="service-card" data-reveal><div class="ico">▣</div><h3>Ongoing Support</h3><p>Monitoring, fixes and iteration after launch, with a team that already knows the codebase.</p></div>
     </div>
   </section>
 
-  <!-- 8. تحسين قسم الأعمال (Zoom + Shine) -->
+  <!-- قسم المشاريع المحدث والمنسق بشكل احترافي -->
   <section id="work">
     <div class="section-head left" data-reveal>
       <div class="eyebrow">Selected work</div>
       <h2>Recent builds</h2>
     </div>
     <div class="work-grid">
-      <div class="work-card" data-tilt data-tilt-max="8" data-tilt-speed="400" data-reveal>
-        <div class="work-thumb"><div class="device"><div class="bar"><i></i><i></i><i></i></div><div class="lines"><i></i><i></i><i></i></div></div></div>
-        <div class="work-body"><div class="tag">Real Estate</div><h3>Harbor View — sales platform</h3><p>Listings, virtual tours and lead capture for a residential developer.</p></div>
-      </div>
-      <div class="work-card" data-tilt data-tilt-max="8" data-tilt-speed="400" data-reveal>
-        <div class="work-thumb"><div class="device"><div class="bar"><i></i><i></i><i></i></div><div class="lines"><i></i><i></i><i></i></div></div></div>
-        <div class="work-body"><div class="tag">Retail</div><h3>Fielder — e-commerce rebuild</h3><p>Headless storefront that cut checkout time by half.</p></div>
-      </div>
-      <div class="work-card" data-tilt data-tilt-max="8" data-tilt-speed="400" data-reveal>
-        <div class="work-thumb"><div class="device"><div class="bar"><i></i><i></i><i></i></div><div class="lines"><i></i><i></i><i></i></div></div></div>
-        <div class="work-body"><div class="tag">Logistics</div><h3>Routeon — fleet dashboard</h3><p>Real-time tracking and dispatch tooling for a delivery operator.</p></div>
-      </div>
-      <div class="work-card" data-tilt data-tilt-max="8" data-tilt-speed="400" data-reveal>
-        <div class="work-thumb"><div class="device"><div class="bar"><i></i><i></i><i></i></div><div class="lines"><i></i><i></i><i></i></div></div></div>
-        <div class="work-body"><div class="tag">Fintech</div><h3>Ledgerly — payments app</h3><p>Mobile-first expense tracking with bank-level auth.</p></div>
-      </div>
-    </div>
-  </section>
 
-  <!-- 9. تحسين Team Cards -->
-  <section id="team">
-    <div class="section-head" data-reveal>
-      <div class="eyebrow" style="justify-content:center;">Our people</div>
-      <h2>Meet the team</h2>
-      <p>The senior engineers and leads behind every build.</p>
-    </div>
-    <div class="team-grid">
-
-      <div class="team-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-reveal>
-        <div class="avatar">
-          <img src="https://avatars.githubusercontent.com/u/206440804?v=4" alt="عادل أحمد البوشي">
-          <div class="placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
-          </div>
+      <div class="work-card" data-reveal>
+        <div class="work-thumb">
+          <img src="./Media/png1.png" alt="Naharco Al-Duwlia">
         </div>
-        <h3>عادل أحمد البوشي</h3>
-        <div class="role">Product Manager</div>
-        <a href="https://github.com/adel307" target="_blank" class="gh">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.4 1 .1-.8.4-1.3.8-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11 11 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-6 7.9-10.9C23.5 5.7 18.3.5 12 .5Z"/></svg>
-          GitHub
-        </a>
+        <div class="work-body">
+          <div class="tag">Naharco Al-Duwlia</div>
+          <h3>Naharco Al-Duwlia — Company Portfolio</h3>
+          <p>The "Naharko International" platform is a personal and professional website that showcases the organization's services, mission, articles, and contact information to facilitate communication and inquiries.</p>
+        </div>
       </div>
 
-      <div class="team-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-reveal>
-        <div class="avatar">
-          <img src="https://avatars.githubusercontent.com/u/250884955?v=4" alt="أحمد عيد">
-          <div class="placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
-          </div>
+      <div class="work-card" data-reveal>
+        <div class="work-thumb">
+          <img src="./Media/png2.png" alt="Payment system">
         </div>
-        <h3>أحمد عيد</h3>
-        <div class="role">QA Engineer</div>
-        <a href="https://github.com/ahmed1eid" target="_blank" class="gh">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.4 1 .1-.8.4-1.3.8-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11 11 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-6 7.9-10.9C23.5 5.7 18.3.5 12 .5Z"/></svg>
-          GitHub
-        </a>
+        <div class="work-body">
+          <div class="tag">Payment system</div>
+          <h3>Payment system</h3>
+          المميزات الرئيسية
+          <ul>
+            <li>الحسابات والهوية
+            <li>التحويلات المالية</li>
+            <li>طلبات الدفع (Payment Requests)</li>
+            <li>إدارة البطاقات الائتمانية</li>
+            <li>المعاملات والإشعارات ولوحة التحكم</li>
+            <li>دعم اللغتين العربية والإنجليزية</li>
+            <li>لوحة إدارة احترافية</li>
+          </ul>
+        </div>
       </div>
 
-      <div class="team-card" data-tilt data-tilt-max="10" data-tilt-speed="400" data-reveal>
-        <div class="avatar">
-          <img src="https://avatars.githubusercontent.com/u/125691487?v=4" alt="إسلام حمدي">
-          <div class="placeholder">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
-          </div>
+      <div class="work-card" data-reveal>
+        <div class="work-thumb">
+          <img src="./Media/png2.png" alt="Payment system">
         </div>
-        <h3>إسلام حمدي</h3>
-        <div class="role">Backend Team Leader</div>
-        <a href="https://github.com/islam412" target="_blank" class="gh">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5 3.3 9.4 7.9 10.9.6.1.8-.3.8-.6v-2c-3.2.7-3.9-1.4-3.9-1.4-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.4 1 .1-.8.4-1.3.8-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11 11 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.9 1.2 3.1 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-6 7.9-10.9C23.5 5.7 18.3.5 12 .5Z"/></svg>
-          GitHub
-        </a>
+        <div class="work-body">
+          <div class="tag">Payment system</div>
+          <h3>Payment system</h3>
+          <a href="https://github.com/Islam412/Payment-system" class="btn btn-outline">View Project</a>
+          المميزات الرئيسية
+          <ul>
+            <li>الحسابات والهوية
+            <li>التحويلات المالية</li>
+            <li>طلبات الدفع (Payment Requests)</li>
+            <li>إدارة البطاقات الائتمانية</li>
+            <li>المعاملات والإشعارات ولوحة التحكم</li>
+            <li>دعم اللغتين العربية والإنجليزية</li>
+            <li>لوحة إدارة احترافية</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="work-card" data-reveal>
+        <div class="work-thumb">
+          <img src="./Media/png2.png" alt="Payment system">
+        </div>
+        <div class="work-body">
+          <div class="tag">Payment system</div>
+          <h3>Payment system</h3>
+          <a href="https://github.com/Islam412/Payment-system" class="btn btn-outline">View Project</a>
+          المميزات الرئيسية
+          <ul>
+            <li>الحسابات والهوية
+            <li>التحويلات المالية</li>
+            <li>طلبات الدفع (Payment Requests)</li>
+            <li>إدارة البطاقات الائتمانية</li>
+            <li>المعاملات والإشعارات ولوحة التحكم</li>
+            <li>دعم اللغتين العربية والإنجليزية</li>
+            <li>لوحة إدارة احترافية</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -589,34 +609,17 @@
     <div class="global">
       <div data-reveal>
         <div class="eyebrow">Global reach</div>
-        <h2 style="font-family:var(--display); font-size:clamp(26px,3vw,34px); font-weight:700; margin-bottom:16px;">Two hubs, one senior team</h2>
+        <h2 style="font-family:var(--display); font-size:clamp(26px,3vw,34px); font-weight:700; margin-bottom:16px;">Three engineers, one team</h2>
         <ul class="global-list">
           <li><b>Cairo, Egypt</b><span>Core engineering &amp; design team</span></li>
-          <li><b>Riyadh, KSA</b><span>Client success &amp; delivery</span></li>
-          <li><b>Remote-friendly</b><span>Overlap hours with EU and GCC time zones</span></li>
         </ul>
       </div>
-      <div class="dotmap" data-reveal>
-        <div class="dotfield"></div>
-        <div class="rings">
-          <div class="ring r1"></div>
-          <div class="ring r2"></div>
-          <div class="ring r3"></div>
-        </div>
-        <div class="core"></div>
-        <svg class="arc" viewBox="0 0 400 300" style="position:absolute; inset:0; width:100%; height:100%;">
-          <path id="hubPath" d="M 224 122 Q 268 70 292 176" fill="none" stroke="var(--violet-2)" stroke-width="1.5" stroke-dasharray="4 5" opacity="0.6">
-            <animate attributeName="stroke-dashoffset" from="0" to="-18" dur="1.2s" repeatCount="indefinite"/>
-          </path>
-          <circle class="traveler" r="3.2" fill="var(--cream)" style="offset-path:path('M 224 122 Q 268 70 292 176');"/>
-        </svg>
-        <div class="pin" style="top:38%; inset-inline-start:56%; animation-delay:.1s;"><span class="led"></span>Cairo</div>
-        <div class="pin" style="top:58%; inset-inline-start:74%; animation-delay:.3s;"><span class="led"></span>Riyadh</div>
+      <div class="globe-container" data-reveal>
+        <canvas id="globe-canvas"></canvas>
       </div>
     </div>
   </section>
 
-  <!-- 10. تحسين Contact Form -->
   <section id="contact">
     <div class="cta-panel" data-reveal>
       <div class="cta-left">
@@ -659,7 +662,111 @@
 </footer>
 
 <script>
-  // Team photo placeholders: swap in automatically once an <img src="..."> is set
+  const track = document.getElementById('trustTrack');
+  if (track) {
+    track.innerHTML += track.innerHTML;
+  }
+
+  const container = document.querySelector('.globe-container');
+  const canvas = document.getElementById('globe-canvas');
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+  camera.position.z = 2.8;
+
+  const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  scene.add(new THREE.AmbientLight(0xffffff, 1.2));
+  const pointLight = new THREE.PointLight(0xc084fc, 2, 50);
+  pointLight.position.set(5, 3, 5);
+  scene.add(pointLight);
+
+  const globeGroup = new THREE.Group();
+  scene.add(globeGroup);
+
+  const textureLoader = new THREE.TextureLoader();
+  textureLoader.load('https://threejs.org/examples/textures/planets/earth_atmos_2048.jpg', (texture) => {
+    const sphereGeometry = new THREE.SphereGeometry(1, 64, 64);
+    const sphereMaterial = new THREE.MeshStandardMaterial({
+      map: texture,
+      roughness: 0.8,
+      metalness: 0.2,
+      color: 0x9061f9
+    });
+    const globe = new THREE.Mesh(sphereGeometry, sphereMaterial);
+    globeGroup.add(globe);
+  });
+
+  function latLongToVector3(lat, lon, radius, outVector) {
+    const phi = (90 - lat) * (Math.PI / 180);
+    const theta = (lon + 180) * (Math.PI / 180);
+    outVector.x = -(radius * Math.sin(phi) * Math.cos(theta));
+    outVector.z = (radius * Math.sin(phi) * Math.sin(theta));
+    outVector.y = (radius * Math.cos(phi));
+  }
+
+  const cairoVector = new THREE.Vector3();
+  latLongToVector3(30.04, 31.23, 1.02, cairoVector);
+
+  const pinGeometry = new THREE.SphereGeometry(0.03, 16, 16);
+  const pinMaterial = new THREE.MeshBasicMaterial({ color: 0xc084fc });
+  const cairoPin = new THREE.Mesh(pinGeometry, pinMaterial);
+  cairoPin.position.copy(cairoVector);
+  globeGroup.add(cairoPin);
+
+  const ringGeometry = new THREE.RingGeometry(0.04, 0.07, 16);
+  const ringMaterial = new THREE.MeshBasicMaterial({ color: 0xec4899, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
+  const cairoRing = new THREE.Mesh(ringGeometry, ringMaterial);
+  cairoRing.position.copy(cairoVector);
+  cairoRing.lookAt(0, 0, 0);
+  globeGroup.add(cairoRing);
+
+  let isDragging = false;
+  let previousMousePosition = { x: 0, y: 0 };
+
+  container.addEventListener('pointerdown', (e) => {
+    isDragging = true;
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+  });
+
+  container.addEventListener('pointermove', (e) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - previousMousePosition.x;
+    const deltaY = e.clientY - previousMousePosition.y;
+
+    globeGroup.rotation.y += deltaX * 0.005;
+    globeGroup.rotation.x += deltaY * 0.005;
+
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+  });
+
+  window.addEventListener('pointerup', () => { isDragging = false; });
+
+  let clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    
+    if (!isDragging) {
+      globeGroup.rotation.y += 0.0015;
+    }
+
+    const elapsedTime = clock.getElapsedTime();
+    const scale = 1 + Math.sin(elapsedTime * 4) * 0.3;
+    cairoRing.scale.set(scale, scale, 1);
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    if (!container) return;
+    camera.aspect = container.clientWidth / container.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+  });
+
   document.querySelectorAll('.avatar img').forEach(img=>{
     const ph = img.nextElementSibling;
     if(img.getAttribute('src')){
@@ -669,7 +776,6 @@
     img.addEventListener('error', ()=>{ img.style.display='none'; if(ph) ph.style.display='flex'; });
   });
 
-  // Scroll progress bar
   const scrollBar = document.getElementById('scrollBar');
   function updateScrollBar(){
     const h = document.documentElement;
@@ -679,7 +785,6 @@
   window.addEventListener('scroll', updateScrollBar, {passive:true});
   updateScrollBar();
 
-  // 12. تحسين الأداء باستخدام Intersection Observer
   const groups = {};
   document.querySelectorAll('[data-reveal]').forEach(el=>{
     const parent = el.parentElement;
@@ -694,7 +799,6 @@
   }, {threshold:0.12});
   document.querySelectorAll('[data-reveal]').forEach(i=>io.observe(i));
 
-  // Count-up stats (11)
   const counters = document.querySelectorAll('[data-count]');
   const countIO = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{
@@ -704,26 +808,24 @@
       const decimals = parseInt(el.dataset.decimal || '0');
       const suffix = el.dataset.suffix || '';
       const dur = 1400; const start = performance.now();
-      function tick(now){
+      function timestamp(now){
         const p = Math.min(1, (now-start)/dur);
         const eased = 1 - Math.pow(1-p, 3);
         const val = (target*eased).toFixed(decimals);
         el.textContent = val + suffix;
-        if(p<1) requestAnimationFrame(tick);
+        if(p<1) requestAnimationFrame(timestamp);
       }
-      requestAnimationFrame(tick);
+      requestAnimationFrame(timestamp);
       countIO.unobserve(el);
     });
   }, {threshold:0.6});
   counters.forEach(c=>countIO.observe(c));
 
-  // Cursor glow follows pointer within hero
   const glowEl = document.querySelector('.glow');
   window.addEventListener('pointermove', (e)=>{
     glowEl.style.setProperty('--x', e.clientX+'px');
     glowEl.style.setProperty('--y', e.clientY+'px');
 
-    // 6. Parallax effect on Hero section
     const xPos = (e.clientX / window.innerWidth - 0.5) * 20;
     const yPos = (e.clientY / window.innerHeight - 0.5) * 20;
     const heroContent = document.getElementById('heroContent');
@@ -731,25 +833,6 @@
       heroContent.style.transform = `translate(${xPos}px, ${yPos}px)`;
     }
   });
-
-  // 7. Button ripple effect
-  document.querySelectorAll('.btn, .nav-cta').forEach(btn=>{
-    btn.style.position = btn.style.position || 'relative';
-    btn.style.overflow = 'hidden';
-    btn.addEventListener('click', function(e){
-      const rect = this.getBoundingClientRect();
-      const ripple = document.createElement('span');
-      const size = Math.max(rect.width, rect.height)*2;
-      ripple.style.cssText = `position:absolute;border-radius:50%;pointer-events:none;
-        width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;
-        background:rgba(255,255,255,0.22);transform:scale(0);animation:rippleAnim .7s var(--ease);`;
-      this.appendChild(ripple);
-      setTimeout(()=>ripple.remove(), 650);
-    });
-  });
-  const style = document.createElement('style');
-  style.textContent = '@keyframes rippleAnim{to{transform:scale(1); opacity:0;}}';
-  document.head.appendChild(style);
 </script>
 
 </body>
